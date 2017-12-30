@@ -14,40 +14,51 @@ class CMSController extends Controller
 
     public function show(Request $request)
     {
-        $data = $this->faculty($request->email);
-        if($data)
+        if($request->email)
         {
-            $roles = $this->role($data->e_id);
-            $role = array();
-            foreach ($roles as $roles) {                
-                array_push($role, $roles->roles_id);
+            $data = $this->faculty($request->email);
+            if($data)
+            {
+                $roles = $this->role($data->e_id);
+                $roleList = array();
+                foreach ($roles as $role) {                
+                    array_push($roleList, $roles->roles_id);
+                }
+                $dataModel['data'] = [
+                    'user' => 'staff',
+                    'e_id' => $data->e_id,
+                    'first_name' => $data->first_name,
+                    'last_name' => $data->last_name,
+                    'type' => $data->type,
+                    'role' => $roleList
+                ];
             }
-            $dataModel['data'] = [
-                'e_id' => $data->e_id,
-                'first_name' => $data->first_name,
-                'last_name' => $data->last_name,
-                'type' => $data->type,
-                'role' => $role
-            ];
-        }
-        else
-        {
-            $data = $this->student($request->email);
-            $dataModel['data'] = [
-                'uid' => $data->uid,
-                'first_name' => $data->first_name,
-                'last_name' => $data->last_name
-            ];
-        }
-        if($dataModel['data'])
-        {
-            $dataModel['error'] = false;
-            $dataModel['message'] = "Success";
+            else
+            {
+                $data = $this->student($request->email);
+                $dataModel['data'] = [
+                    'user' => 'student',
+                    'uid' => $data->uid,
+                    'first_name' => $data->first_name,
+                    'last_name' => $data->last_name
+                ];
+            }
+            if($dataModel['data'])
+            {
+                $dataModel['error'] = false;
+                $dataModel['message'] = "Success";
+            }
+            else
+            {
+                $dataModel['error'] = true;
+                $dataModel['message'] = "No data found";
+            }
         }
         else
         {
             $dataModel['error'] = true;
-            $dataModel['message'] = "No data found";
+            $dataModel['message'] = "Email parameter not found";
+            $dataModel['data'] = null;
         }
         $dataResource= new cms($dataModel);
         return $dataResource;
