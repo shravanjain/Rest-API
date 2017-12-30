@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Staff;
 use App\Role;
 use App\Student;
+use App\ProfilePic;
 use App\Http\Resources\cms;
 
 class CMSController extends Controller
@@ -77,5 +78,17 @@ class CMSController extends Controller
     public function student($email)
     {
         return Student::where('email_id' , $email)->first();
+    }
+
+    public function getProfilePic()
+    {
+        $data = ProfilePic::where('id' , 200)->first();
+        $data['image'] = base64_encode($data['image']);
+        return $data;
+        $dataModel['data'] = $data;
+        $dataModel['error'] = false;
+        $dataModel['message'] = "GG Profile Pic";
+        $dataResource= new cms($dataModel);
+        return $dataResource;
     }
 }
